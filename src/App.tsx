@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import './App.css';
+import classnames from 'classnames';
+import './App.scss';
 
 const TextDisplay = ({
   value,
@@ -12,15 +13,18 @@ const TextDisplay = ({
     className="textDisplay"
   >
     {[...targetValue].map((char, i) => {
-      const className = value[i] === undefined
-        ? 'charInactive'
-        : char === value[i]
-          ? 'charSuccess'
-          : 'charError'
+      const isInactive = value[i] === undefined
+      const isSuccess = !isInactive && char === value[i]
 
       return (
         <span
-          className={`char ${className}`}
+          // TODO: Replace "classnames" lib with emotion?
+          className={classnames('char', {
+            charInactive: isInactive,
+            charSuccess: isSuccess,
+            charError: !isInactive && !isSuccess,
+            charCursor: i === value.length
+          })}
         >
           {char}
         </span>
@@ -34,6 +38,7 @@ const TextInput = ({
   onChange
 }: React.HTMLProps<HTMLTextAreaElement>) => (
   <textarea
+    autoFocus
     className="textInput"
     value={value}
     onChange={onChange}

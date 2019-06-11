@@ -15,22 +15,38 @@
   bottom: 0;
   right: 0;
   font-size: 2rem;
-  font-weight: bold;
   color: #888;
   max-width: 60rem;
   padding: 2rem;
   pointer-events: none;
-  white-space: pre-wrap;
   font-family: menlo, monospace;
   margin: 0 auto;
+  white-space: pre-line;
 }
 
 .char {
-  display: inline-block;
+  position: relative;
+  margin: 0.5rem 1px;
+}
+
+.charCursor {
+  color: #666;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: -1;
+    background: #eee;
+  }
 }
 
 .charSuccess {
   color: #000;
+  animation: 2s greenToBlack;
 }
 
 .charError {
@@ -38,12 +54,7 @@
   background: #ff0000;
 }
 
-.charSuccess, .charError {
-  animation: 0.2s bounce;
-  transform-origin: center;
-}
-
-@keyframes bounce {
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+@keyframes greenToBlack {
+  0% { color: #42f486; }
+  100% { color: #000; }
 }
