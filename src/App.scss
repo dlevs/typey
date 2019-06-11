@@ -21,12 +21,16 @@
   pointer-events: none;
   font-family: menlo, monospace;
   margin: 0 auto;
-  white-space: pre-line;
+}
+
+.word {
+  display: inline-block;
+  margin: 0.5rem 0;
 }
 
 .char {
   position: relative;
-  margin: 0.5rem 1px;
+  margin: 0 1px;
 }
 
 .charCursor {
