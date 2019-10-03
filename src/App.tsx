@@ -2,6 +2,26 @@ import React, { useState } from 'react';
 import classnames from 'classnames';
 import './App.scss';
 
+const ctx = new AudioContext()
+const sound = fetch('/audio/9744_28132-hq.mp3')
+  .then(response => response.arrayBuffer())
+  .then(buffer => ctx.decodeAudioData(buffer))
+
+// TODO: Move.
+const playKeypressSound = async () => {
+  const sourceNode = ctx.createBufferSource()
+  const gainNode = ctx.createGain()
+
+  sourceNode.buffer = await sound
+  sourceNode.detune.value = 0 - (200 * (Math.random() * 0.5))
+  gainNode.gain.value = 1 - (Math.random() * 0.5)
+
+  sourceNode.connect(gainNode);
+  gainNode.connect(ctx.destination);
+
+  sourceNode.start(0);
+}
+
 const TextDisplay = ({
   value,
   targetValue
@@ -97,7 +117,10 @@ const App: React.FC = () => {
       />
       <TextInput
         value={textInput}
-        onChange={e => setTextInput(e.currentTarget.value)}
+        onChange={e => {
+          playKeypressSound()
+          setTextInput(e.currentTarget.value)
+        }}
       />
     </>
   );
