@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import classnames from 'classnames';
 import './App.scss';
 
@@ -95,6 +95,8 @@ const TextDisplay = ({
   )
 }
 
+const getWords = (str: string) => str.split(/\s+/)
+
 const TextInput = ({
   value,
   onChange
@@ -107,13 +109,78 @@ const TextInput = ({
   />
 )
 
+const StatsDisplay = ({
+  value,
+  targetValue
+}: {
+  value: string,
+  targetValue: string
+}) => {
+  const words = getWords(value)
+
+  return words.length < 3
+    ? null
+    : (
+      <>
+        <StatsDisplayAccuracy
+          value={value}
+          targetValue={targetValue}
+        />
+        <StatsDisplayWordsPerMinute
+          value={value}
+          targetValue={targetValue}
+        />
+      </>
+    )
+}
+
+const StatsDisplayAccuracy = ({
+  value,
+  targetValue
+}: {
+  value: string,
+  targetValue: string
+}) => {
+  const numberOfMatches = [...value]
+    .map((char, i) => char === targetValue[i])
+    .filter(Boolean)
+    .length
+  const accuracyPercentage = (numberOfMatches / value.length) * 100
+
+  return <div>{Math.floor(accuracyPercentage)}%</div>
+}
+
+const StatsDisplayWordsPerMinute = ({
+  value,
+  targetValue
+}: {
+  value: string,
+  targetValue: string
+}) => {
+  // TODO: Record keydown events on document instead of textarea onchange.
+  // Store each character in an array with timestamp for determining which were
+  // inputted in last 60 seconds for WPM value.
+  // TODO: Calculate words, correct words (incorrect not to count towards wpm?), general accuracy, etc at top level component. Pass down
+
+  // useEffect(() => {
+
+  // }, [words])
+
+  return <div>10 WPM {getWords(value).length}</div>
+}
+
 const App: React.FC = () => {
   const [textInput, setTextInput] = useState('')
+  const targetValue = 'The fight isn\'t over until you win it, Fitz. That\'s all you have to remember. No matter what the other man says.\nKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.'
   return (
     <>
+      <StatsDisplay
+        value={textInput}
+        targetValue={targetValue}
+      />
       <TextDisplay
         value={textInput}
-        targetValue={'The fight isn\'t over until you win it, Fitz. That\'s all you have to remember. No matter what the other man says.\nKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.'}
+        targetValue={targetValue}
       />
       <TextInput
         value={textInput}
