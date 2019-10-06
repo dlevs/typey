@@ -1,18 +1,17 @@
-import React from 'react'
-import classnames from 'classnames'
+/** @jsx jsx */
+import { jsx } from '@emotion/core'
 import useKeysPressed, { selectWordsPerMinute } from '../hooks/useKeysPressed'
+import FadeInAndOut from './FadeInOut'
 
 const TypingStatsDisplayWordsPerMinute = ({ chars }: {
   chars: ReturnType<typeof useKeysPressed>;
 }) => {
   const wordsPerMinute = selectWordsPerMinute(chars);
   return (
-    <div className={classnames('feedbackDisplay', {
-      feedbackDisplayActive: wordsPerMinute > 0
-    })}>
+    <FadeInAndOut show={wordsPerMinute > 0}>
       {`${wordsPerMinute} `}
       <abbr title={'Words per minute'}>WPM</abbr>
-    </div>
+    </FadeInAndOut>
   );
 }
 

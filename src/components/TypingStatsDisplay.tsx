@@ -1,4 +1,5 @@
-import React from 'react'
+/** @jsx jsx */
+import { jsx } from '@emotion/core'
 import useKeysPressed, { selectStringValue } from '../hooks/useKeysPressed'
 import TypingStatsDisplayWordsPerMinute from './TypingStatsDisplayWordsPerMinute';
 import TypingStatsDisplayAccuracy from './TypingStatsDisplayAccuracy';

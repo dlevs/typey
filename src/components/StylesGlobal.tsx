@@ -1,6 +1,5 @@
 /** @jsx jsx */
-import { css, jsx } from '@emotion/core'
-import { Global } from '@emotion/core'
+import { Global, css, jsx } from '@emotion/core'
 
 const StylesGlobal = () =>
   <Global styles={css`

@@ -62,12 +62,12 @@ export const selectStringValue = defaultMemoize(
 export const selectWords = defaultMemoize(
   (chars: CharMeta[]) => chars
     .reduce((words, { char, timeStamp }) => {
-      const isWhitespace = /^\s$/.test(char)
-      if (isWhitespace || words.length === 0) {
+      const isWordDelimiter = /^[\s,.;:]$/.test(char)
+      if (isWordDelimiter || words.length === 0) {
         words.push({ word: '', timeStamp })
       }
 
-      if (!isWhitespace) {
+      if (!isWordDelimiter) {
         const lastWord = words[words.length - 1]
         lastWord.word += char
         lastWord.timeStamp = timeStamp

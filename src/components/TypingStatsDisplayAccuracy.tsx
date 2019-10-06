@@ -1,5 +1,6 @@
-import React from 'react'
-import classnames from 'classnames'
+/** @jsx jsx */
+import { jsx } from '@emotion/core'
+import FadeInAndOut from './FadeInOut'
 
 const TypingStatsDisplayAccuracy = ({ value, targetValue }: {
   value: string;
@@ -14,12 +15,9 @@ const TypingStatsDisplayAccuracy = ({ value, targetValue }: {
     : (numberOfMatches / value.length) * 100;
 
   return (
-    // TODO: Use CSS modules here
-    <div className={classnames('feedbackDisplay', {
-      feedbackDisplayActive: value.length > 0
-    })}>
+    <FadeInAndOut show={value.length > 0}>
       {Math.floor(accuracyPercentage)}%
-    </div>
+    </FadeInAndOut>
   );
 }
 

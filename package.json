@@ -4,18 +4,15 @@
   "private": true,
   "dependencies": {
     "@emotion/core": "10.0.21",
-    "classnames": "2.2.6",
+    "@emotion/styled": "10.0.17",
     "hooks.macro": "1.0.1",
-    "ramda": "0.26.1",
     "react": "16.10.2",
     "react-dom": "16.10.2",
     "reselect": "4.0.0"
   },
   "devDependencies": {
-    "@types/classnames": "2.2.9",
     "@types/jest": "24.0.18",
     "@types/node": "12.7.11",
-    "@types/ramda": "0.26.26",
     "@types/react": "16.9.5",
     "@types/react-dom": "16.9.1",
     "react-scripts": "3.2.0",
