@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import classnames from 'classnames';
 import './App.scss';
+import useEventListener from './hooks/useEventListener';
+import { useAutoCallback } from 'hooks.macro';
 
 const ctx = new AudioContext()
 const sound = fetch('/audio/9744_28132-hq.mp3')
@@ -79,7 +81,9 @@ const TextDisplay = ({
                               ? <>&nbsp;</>
                               : char === '\n'
                                 ? '⏎'
-                                : char
+                                : char === '\t'
+                                  ? <>⇨&nbsp;</>
+                                  : char
                             }
                           </span>
                         )
@@ -96,18 +100,6 @@ const TextDisplay = ({
 }
 
 const getWords = (str: string) => str.split(/\s+/)
-
-const TextInput = ({
-  value,
-  onChange
-}: React.HTMLProps<HTMLTextAreaElement>) => (
-  <textarea
-    autoFocus
-    className="textInput"
-    value={value}
-    onChange={onChange}
-  />
-)
 
 const StatsDisplay = ({
   value,
@@ -158,7 +150,7 @@ const StatsDisplayWordsPerMinute = ({
   targetValue: string
 }) => {
   // TODO: Record keydown events on document instead of textarea onchange.
-  // Store each character in an array with timestamp for determining which were
+  // Store each character in an array with timeStamp for determining which were
   // inputted in last 60 seconds for WPM value.
   // TODO: Calculate words, correct words (incorrect not to count towards wpm?), general accuracy, etc at top level component. Pass down
 
@@ -169,26 +161,62 @@ const StatsDisplayWordsPerMinute = ({
   return <div>10 WPM {getWords(value).length}</div>
 }
 
+const targetValue = 'The fight isn\'t over until you win it, Fitz. That\'s all you have to remember. No matter what the other man says.\n\tKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.'
+
+interface CharMeta {
+  char: string
+  timeStamp: number
+}
+
 const App: React.FC = () => {
-  const [textInput, setTextInput] = useState('')
-  const targetValue = 'The fight isn\'t over until you win it, Fitz. That\'s all you have to remember. No matter what the other man says.\nKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.'
+  const [chars, setChars] = useState([] as CharMeta[])
+  // const chars = [...textInput].map((char, i) => {
+
+  // })
+
+  useEventListener(window, 'keydown', useAutoCallback(e => {
+    e.preventDefault()
+    let { key, ctrlKey, altKey, metaKey } = e as KeyboardEvent
+
+    if (ctrlKey || altKey || metaKey) return
+
+    if (key === 'Enter') {
+      key = '\n'
+    } else if (key === 'Tab') {
+      key = '\t'
+    }
+
+    if (key === 'Backspace') {
+      setChars(prevCars => prevCars.slice(0, -1))
+    } else if (key.length === 1) {
+      setChars(prevCars => [...prevCars, {
+        char: key,
+        timeStamp: e.timeStamp
+      }])
+    }
+  }))
+
   return (
     <>
-      <StatsDisplay
+      {/* <StatsDisplay
         value={textInput}
         targetValue={targetValue}
-      />
+      /> */}
       <TextDisplay
-        value={textInput}
+        value={chars.map(({ char }) => char).join('')}
         targetValue={targetValue}
       />
-      <TextInput
+      {/* <TextInput
         value={textInput}
-        onChange={e => {
+        onKeyDown={e => {
           playKeypressSound()
+          console.log(e)
+          setChars(prevChars => {
+            // console.log()
+          })
           setTextInput(e.currentTarget.value)
         }}
-      />
+      /> */}
     </>
   );
 }

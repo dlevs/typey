@@ -1,13 +1,3 @@
-.textInput {
-  width: 100%;
-  height: 100%;
-  display: block;
-  border: none;
-  outline: none;
-  resize: none;
-  opacity: 0;
-}
-
 .textDisplay {
   position: absolute;
   top: 0;
@@ -18,9 +8,9 @@
   color: #888;
   max-width: 60rem;
   padding: 2rem;
-  pointer-events: none;
   font-family: menlo, monospace;
   margin: 0 auto;
+  overflow: auto;
 }
 
 .word {
