@@ -1,4 +1,4 @@
-.textDisplay {
+.layout {
   position: absolute;
   top: 0;
   left: 0;
@@ -46,15 +46,6 @@
 .charError {
   color: #fff;
   background: #ff0000;
-}
-
-.feedbackDisplay {
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.feedbackDisplayActive {
-  opacity: 1;
 }
 
 @keyframes greenToBlack {

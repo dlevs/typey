@@ -1,4 +1,5 @@
-import React from 'react'
+/** @jsx jsx */
+import { css, jsx } from '@emotion/core'
 import classnames from 'classnames'
 
 const TypingTextDisplay = ({
@@ -11,9 +12,7 @@ const TypingTextDisplay = ({
   let indexCount = 0
 
   return (
-    <div
-      className="textDisplay"
-    >
+    <div className={s.layout}>
       {targetValue
         .split('\n')
         .map((paragraph, paragraphIndex, paragraphs) => {
@@ -37,7 +36,7 @@ const TypingTextDisplay = ({
                   }
 
                   return (
-                    <span className="word" key={wordIndex}>
+                    <span className={s.word} key={wordIndex}>
                       {chars.map(char => {
                         const i = indexCount++
                         const isInactive = value[i] === undefined
@@ -47,11 +46,11 @@ const TypingTextDisplay = ({
                           <span
                             key={i}
                             // TODO: Replace "classnames" lib with emotion?
-                            className={classnames('char', {
-                              charInactive: isInactive,
-                              charSuccess: isSuccess,
-                              charError: !isInactive && !isSuccess,
-                              charCursor: i === value.length
+                            className={classnames(s.char, {
+                              [s.charInactive]: isInactive,
+                              [s.charSuccess]: isSuccess,
+                              [s.charError]: !isInactive && !isSuccess,
+                              [s.charCursor]: i === value.length
                             })}
                           >
                             {char === ' '
