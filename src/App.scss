@@ -48,6 +48,15 @@
   background: #ff0000;
 }
 
+.feedbackDisplay {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.feedbackDisplayActive {
+  opacity: 1;
+}
+
 @keyframes greenToBlack {
   0% { color: #42f486; }
   100% { color: #000; }
