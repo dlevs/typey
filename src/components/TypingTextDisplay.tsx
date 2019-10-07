@@ -26,7 +26,6 @@ const Character = styled.span<{
   status: 'inactive' | 'cursor' | 'success' | 'error'
 }>(
   ({ status }) => css`
-    position: relative;
     margin: 0 1px;
     color: ${status === 'cursor'
       ? '#666'

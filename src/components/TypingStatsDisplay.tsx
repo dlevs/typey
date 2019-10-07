@@ -1,6 +1,9 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
-import useKeysPressed, { selectStringValue } from '../hooks/useKeysPressed'
+import useKeysPressed, {
+  selectStringValue,
+  selectWordsPerMinute
+} from '../hooks/useKeysPressed'
 import TypingStatsDisplayWordsPerMinute from './TypingStatsDisplayWordsPerMinute';
 import TypingStatsDisplayAccuracy from './TypingStatsDisplayAccuracy';
 
@@ -15,7 +18,7 @@ const TypingStatsDisplay = ({ chars, targetValue }: {
         targetValue={targetValue}
       />
       <TypingStatsDisplayWordsPerMinute
-        chars={chars}
+        wordsPerMinute={selectWordsPerMinute(chars)}
       />
     </>
   );

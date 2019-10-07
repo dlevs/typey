@@ -1,12 +1,10 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
-import useKeysPressed, { selectWordsPerMinute } from '../hooks/useKeysPressed'
 import FadeInAndOut from './FadeInOut'
 
-const TypingStatsDisplayWordsPerMinute = ({ chars }: {
-  chars: ReturnType<typeof useKeysPressed>;
+const TypingStatsDisplayWordsPerMinute = ({ wordsPerMinute }: {
+  wordsPerMinute: number
 }) => {
-  const wordsPerMinute = selectWordsPerMinute(chars);
   return (
     <FadeInAndOut show={wordsPerMinute > 0}>
       {`${wordsPerMinute} `}
