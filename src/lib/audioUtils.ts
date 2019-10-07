@@ -1,3 +1,8 @@
+const AudioContext: { new(): AudioContext } = (
+  (window as any).AudioContext ||
+  (window as any).webkitAudioContext
+)
+
 export const ctx = new AudioContext()
 
 export const loadAudioBuffer = (url: string) => fetch(url)

@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx, css } from '@emotion/core'
+import { jsx, css, keyframes } from '@emotion/core'
 import styled from '@emotion/styled'
 
 const Layout = styled.div`
@@ -18,35 +18,56 @@ const Layout = styled.div`
 `
 
 const Word = styled.span`
+  position: relative;
   display: inline-block;
   margin: 0.5rem 0;
 `
+
+const styleCharacterStatusMap = {
+  inactive: css``,
+  cursor: css`
+    color: #fff;
+    background: #03b1fc;
+
+    /* Border around word */
+    &::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      z-index: -1;
+      border: 1px solid #03b1fc;
+      opacity: 0.4;
+    }
+  `,
+  success: css`
+    color: #000;
+    animation: ${keyframes`
+      from { color: #03b1fc; }
+      to { color: #000; }
+    `} 2s;
+  `,
+  error: css`
+    color: #fff;
+    background: #f54542;
+    display: inline-block;
+    position: relative;
+    animation: ${keyframes`
+      0% { transform: translateX(0) scale(1); }
+      50% { transform: translateX(-2px) scale(1.1); }
+      100% { transform: translateX(0) scale(1); }
+    `} 0.2s ease-out;
+  `,
+}
 
 const Character = styled.span<{
   status: 'inactive' | 'cursor' | 'success' | 'error'
 }>(
   ({ status }) => css`
     margin: 0 1px;
-    color: ${status === 'cursor'
-      ? '#666'
-      : status === 'error'
-        ? '#fff'
-        : status === 'success'
-          ? '#000'
-          : 'inherit'
-    };
-    background: ${status === 'cursor'
-      ? '#eee'
-      : status === 'error'
-        ? 'red'
-        : 'inherit'
-    };
-    animation: ${status === 'success' && '2s greenToBlack'};
-
-    @keyframes greenToBlack {
-      0% { color: #42f486; }
-      100% { color: #000; }
-    }
+    ${styleCharacterStatusMap[status]};
   `
 )
 
