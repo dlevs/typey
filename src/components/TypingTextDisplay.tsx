@@ -17,30 +17,28 @@ const Layout = styled.div`
   overflow: auto;
 `
 
-const Word = styled.span`
-  position: relative;
-  display: inline-block;
-  margin: 0.5rem 0;
-`
+const Word = styled.span<{
+  cursor: boolean
+  error: boolean
+}>(({ cursor, error }) =>
+  css`
+    position: relative;
+    display: inline-block;
+    margin: 0.5rem 0;
+    border: 1px solid ${cursor
+      ? error
+        ? '#f54542'
+        : '#03b1fc'
+      : 'transparent'
+    };
+  `
+)
 
 const styleCharacterStatusMap = {
   inactive: css``,
   cursor: css`
     color: #fff;
     background: #03b1fc;
-
-    /* Border around word */
-    &::before {
-      content: "";
-      position: absolute;
-      top: -1px;
-      bottom: -1px;
-      left: 0;
-      right: 0;
-      z-index: -1;
-      border: 1px solid #03b1fc;
-      opacity: 0.4;
-    }
   `,
   success: css`
     color: #000;
@@ -78,7 +76,10 @@ const TypingTextDisplay = ({
   value: string
   targetValue: string
 }) => {
-  let indexCount = 0
+  // TODO: Must split progressValue at same indexes that targetValue is split
+  const progressValue = value.replace(/[\n ]/g, '')
+  let wordProgressIndex = 0
+  let charProgressIndex = 0
 
   return (
     <Layout>
@@ -92,6 +93,10 @@ const TypingTextDisplay = ({
               {paragraph
                 .split(' ')
                 .map((word, wordIndex, words) => {
+                  const valueWordStart = wordProgressIndex
+                  const valueWordEnd = valueWordStart + word.length
+                  wordProgressIndex += word.length
+                  const valueWord = progressValue.substring(valueWordStart, valueWordEnd)
                   const isLastWord = wordIndex === words.length - 1
                   const chars = [...word]
                   const additionalChar = isLastParagraph && isLastWord
@@ -104,10 +109,20 @@ const TypingTextDisplay = ({
                     chars.push(additionalChar)
                   }
 
+                  console.log(valueWordEnd, progressValue.length)
                   return (
-                    <Word key={wordIndex}>
+                    <Word
+                      key={wordIndex}
+                      // TODO: It's odd to have cursor be a boolean here, and part of single
+                      // string status for Character component. Make consistent.
+                      cursor={
+                        progressValue.length > valueWordStart &&
+                        progressValue.length < valueWordEnd
+                      }
+                      error={!word.startsWith(valueWord)}
+                    >
                       {chars.map(char => {
-                        const i = indexCount++
+                        const i = charProgressIndex++
 
                         return (
                           <Character
