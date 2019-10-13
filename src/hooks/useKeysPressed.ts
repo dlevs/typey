@@ -15,6 +15,7 @@ interface WordMeta {
   timeStamp: number
 }
 
+// TODO: This approach won't bring up on-screen keyboard on mobile. Go back to textarea approach.
 const useKeysPressed = (
   target: EventTarget,
   onChangeCallback?: (char: string) => void
@@ -59,6 +60,7 @@ export const selectStringValue = defaultMemoize(
   (chars: CharMeta[]) => chars.map(({ char }) => char).join('')
 )
 
+// TODO: Some of these selectors won't be necessary after removing `useKeysPressed` and using the metadata object in TypingTextDisplay.tsx
 export const selectWords = defaultMemoize(
   (chars: CharMeta[]) => chars
     .reduce((words, { char, timeStamp }) => {
