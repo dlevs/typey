@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
+import { Fragment } from 'react';
 import useKeysPressed, {
   selectStringValue,
   selectWordsPerMinute
@@ -12,7 +13,7 @@ const TypingStatsDisplay = ({ chars, targetValue }: {
   targetValue: string;
 }) => {
   return (
-    <>
+    <Fragment>
       <TypingStatsDisplayAccuracy
         value={selectStringValue(chars)}
         targetValue={targetValue}
@@ -20,7 +21,7 @@ const TypingStatsDisplay = ({ chars, targetValue }: {
       <TypingStatsDisplayWordsPerMinute
         wordsPerMinute={selectWordsPerMinute(chars)}
       />
-    </>
+    </Fragment>
   );
 }
 

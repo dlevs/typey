@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx, css, keyframes } from '@emotion/core'
+import { Fragment } from 'react'
 import styled from '@emotion/styled'
 
 const Layout = styled.div`
@@ -39,6 +40,7 @@ const styleCharacterStatusMap = {
   cursor: css`
     color: #fff;
     background: #03b1fc;
+    border-color: #03b1fc;
   `,
   success: css`
     color: #000;
@@ -50,6 +52,7 @@ const styleCharacterStatusMap = {
   error: css`
     color: #fff;
     background: #f54542;
+    border-color: #f54542;
     display: inline-block;
     position: relative;
     animation: ${keyframes`
@@ -64,10 +67,83 @@ const Character = styled.span<{
   status: 'inactive' | 'cursor' | 'success' | 'error'
 }>(
   ({ status }) => css`
-    margin: 0 1px;
+    border-width: 0 1px;
+    border-style: solid;
+    border-color: transparent;
+
     ${styleCharacterStatusMap[status]};
   `
 )
+
+// TODO: Rename
+interface TextSplitRecord {
+  targetValue: string;
+  value: string;
+  start: number;
+  end: number;
+  isCurrent: boolean;
+  isActive: boolean;
+  isMatch: boolean;
+}
+
+// TODO: Move
+const splitAndKeep = (str: string, char: string) => {
+  return str
+    .split(char)
+    .map((value, i, array) => {
+      return i < array.length - 1
+        ? `${value}${char}`
+        : value
+    })
+}
+
+const createTextSplitReducer = (entireValue: string) =>
+  (entireValueStartOffset: number) =>
+    (
+      // TODO: Rename args
+      accum: TextSplitRecord[],
+      targetValue: string,
+      i: number,
+    ) => {
+      const prev = accum[i - 1] || { end: entireValueStartOffset }
+      const start = prev.end
+      const end = start + targetValue.length
+      const value = entireValue.substring(start, end)
+
+      accum.push({
+        targetValue,
+        value,
+        start,
+        end,
+        isActive: !!value,
+        isCurrent: start <= entireValue.length && end > entireValue.length,
+        isMatch: targetValue.startsWith(value)
+      })
+
+      return accum
+    }
+
+const getTypingMeta = (targetValue: string, value: string) => {
+  const textSplitReducerFromOffset = createTextSplitReducer(value)
+
+  return splitAndKeep(targetValue, '\n')
+    .reduce(textSplitReducerFromOffset(0), [])
+    .map(paragraph => ({
+      ...paragraph,
+      words: splitAndKeep(paragraph.targetValue, ' ')
+        .reduce(textSplitReducerFromOffset(paragraph.start), [])
+        .map(word => ({
+          ...word,
+          chars: [...word.targetValue].reduce(textSplitReducerFromOffset(word.start), [])
+        }))
+    }))
+}
+
+const charValueMap: { [char: string]: JSX.Element | undefined } = {
+  ' ': <Fragment>&nbsp;</Fragment>,
+  '\n': <Fragment>⏎</Fragment>,
+  '\t': <Fragment>⇨&nbsp;</Fragment>
+}
 
 const TypingTextDisplay = ({
   value,
@@ -76,85 +152,42 @@ const TypingTextDisplay = ({
   value: string
   targetValue: string
 }) => {
-  // TODO: Must split progressValue at same indexes that targetValue is split
-  const progressValue = value.replace(/[\n ]/g, '')
-  let wordProgressIndex = 0
-  let charProgressIndex = 0
+  const paragraphs = getTypingMeta(targetValue, value)
 
   return (
     <Layout>
-      {targetValue
-        .split('\n')
-        .map((paragraph, paragraphIndex, paragraphs) => {
-          const isLastParagraph = paragraphIndex === paragraphs.length - 1
-
-          return (
-            <p key={paragraphIndex}>
-              {paragraph
-                .split(' ')
-                .map((word, wordIndex, words) => {
-                  const valueWordStart = wordProgressIndex
-                  const valueWordEnd = valueWordStart + word.length
-                  wordProgressIndex += word.length
-                  const valueWord = progressValue.substring(valueWordStart, valueWordEnd)
-                  const isLastWord = wordIndex === words.length - 1
-                  const chars = [...word]
-                  const additionalChar = isLastParagraph && isLastWord
-                    ? null
-                    : isLastWord
-                      ? '\n'
-                      : ' '
-
-                  if (additionalChar) {
-                    chars.push(additionalChar)
-                  }
-
-                  console.log(valueWordEnd, progressValue.length)
-                  return (
-                    <Word
-                      key={wordIndex}
-                      // TODO: It's odd to have cursor be a boolean here, and part of single
-                      // string status for Character component. Make consistent.
-                      cursor={
-                        progressValue.length > valueWordStart &&
-                        progressValue.length < valueWordEnd
-                      }
-                      error={!word.startsWith(valueWord)}
-                    >
-                      {chars.map(char => {
-                        const i = charProgressIndex++
-
-                        return (
-                          <Character
-                            key={i}
-                            status={
-                              i === value.length
-                                ? 'cursor'
-                                : value[i] == null
-                                  ? 'inactive'
-                                  : char === value[i]
-                                    ? 'success'
-                                    : 'error'
-                            }
-                          >
-                            {char === ' '
-                                ? <>&nbsp;</>
-                                : char === '\n'
-                                  ? '⏎'
-                                  : char === '\t'
-                                    ? <>⇨&nbsp;</>
-                                    : char
-                            }
-                          </Character>
-                        )
-                      })}
-                    </Word>
-                  )
-                })}
-            </p>
-          )
-        })
-      }
+      {paragraphs.map((paragraph, paragraphIndex) => (
+        <p key={paragraphIndex}>
+          {paragraph.words.map((word, wordIndex) => (
+            <Word
+              key={wordIndex}
+              // TODO: It's odd to have cursor be a boolean here, and part of single
+              // string status for Character component. Make consistent.
+              cursor={word.isCurrent}
+              error={!word.isMatch}
+            >
+              {word.chars.map((char, charIndex) => {
+                return (
+                  <Character
+                    key={charIndex}
+                    status={
+                      char.isCurrent
+                        ? 'cursor'
+                        : !char.isActive
+                          ? 'inactive'
+                          : char.isMatch
+                            ? 'success'
+                            : 'error'
+                    }
+                  >
+                    {charValueMap[char.targetValue] || char.targetValue}
+                  </Character>
+                )
+              })}
+            </Word>
+          ))}
+        </p>
+      ))}
     </Layout>
   )
 }
