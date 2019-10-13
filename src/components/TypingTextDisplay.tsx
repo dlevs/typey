@@ -2,6 +2,7 @@
 import { jsx, css, keyframes } from '@emotion/core'
 import { Fragment } from 'react'
 import styled from '@emotion/styled'
+import { getTextComparisonMeta } from '../lib/getTextComparisonMeta'
 
 const Layout = styled.div`
   position: absolute;
@@ -75,70 +76,6 @@ const Character = styled.span<{
   `
 )
 
-// TODO: Rename
-interface TextSplitRecord {
-  targetValue: string;
-  value: string;
-  start: number;
-  end: number;
-  isCurrent: boolean;
-  isActive: boolean;
-  isMatch: boolean;
-}
-
-// TODO: Move
-const splitAndKeep = (str: string, char: string) => {
-  return str
-    .split(char)
-    .map((value, i, array) => {
-      return i < array.length - 1
-        ? `${value}${char}`
-        : value
-    })
-}
-
-const createTextSplitReducer = (entireValue: string) =>
-  (entireValueStartOffset: number) =>
-    (
-      // TODO: Rename args
-      accum: TextSplitRecord[],
-      targetValue: string,
-      i: number,
-    ) => {
-      const prev = accum[i - 1] || { end: entireValueStartOffset }
-      const start = prev.end
-      const end = start + targetValue.length
-      const value = entireValue.substring(start, end)
-
-      accum.push({
-        targetValue,
-        value,
-        start,
-        end,
-        isActive: !!value,
-        isCurrent: start <= entireValue.length && end > entireValue.length,
-        isMatch: targetValue.startsWith(value)
-      })
-
-      return accum
-    }
-
-const getTypingMeta = (targetValue: string, value: string) => {
-  const textSplitReducerFromOffset = createTextSplitReducer(value)
-
-  return splitAndKeep(targetValue, '\n')
-    .reduce(textSplitReducerFromOffset(0), [])
-    .map(paragraph => ({
-      ...paragraph,
-      words: splitAndKeep(paragraph.targetValue, ' ')
-        .reduce(textSplitReducerFromOffset(paragraph.start), [])
-        .map(word => ({
-          ...word,
-          chars: [...word.targetValue].reduce(textSplitReducerFromOffset(word.start), [])
-        }))
-    }))
-}
-
 const charValueMap: { [char: string]: JSX.Element | undefined } = {
   ' ': <Fragment>&nbsp;</Fragment>,
   '\n': <Fragment>⏎</Fragment>,
@@ -152,7 +89,7 @@ const TypingTextDisplay = ({
   value: string
   targetValue: string
 }) => {
-  const paragraphs = getTypingMeta(targetValue, value)
+  const paragraphs = getTextComparisonMeta(targetValue, value)
 
   return (
     <Layout>
