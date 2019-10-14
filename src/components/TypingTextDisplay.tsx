@@ -27,52 +27,52 @@ const Word = styled.span<{
     position: relative;
     display: inline-block;
     margin: 0.5rem 0;
-    border: 1px solid ${cursor
+    outline-color: ${cursor
       ? error
         ? '#f54542'
         : '#03b1fc'
       : 'transparent'
     };
+    outline-width: 1px;
+    outline-style: solid;
+    outline-offset: -1px;
+    transition: outline-color 0.2s;
   `
 )
 
-const styleCharacterStatusMap = {
-  inactive: css``,
-  cursor: css`
-    color: #fff;
-    background: #03b1fc;
-    border-color: #03b1fc;
-  `,
-  success: css`
-    color: #000;
-    animation: ${keyframes`
-      from { color: #03b1fc; }
-      to { color: #000; }
-    `} 2s;
-  `,
-  error: css`
-    color: #fff;
-    background: #f54542;
-    border-color: #f54542;
-    display: inline-block;
-    position: relative;
-    animation: ${keyframes`
-      0% { transform: translateX(0) scale(1); }
-      50% { transform: translateX(-2px) scale(1.1); }
-      100% { transform: translateX(0) scale(1); }
-    `} 0.2s ease-out;
-  `,
-}
-
 const Character = styled.span<{
-  status: 'inactive' | 'cursor' | 'success' | 'error'
+  cursor: boolean
+  error: boolean
+  success: boolean
 }>(
-  ({ status }) => css`
-    border-width: 0 1px;
-    border-style: solid;
-    border-color: transparent;
+  ({ cursor, error, success }) => css`
+    margin: 0 1px;
+    transition: background 0.2s;
 
-    ${styleCharacterStatusMap[status]};
+    ${cursor && css`
+      color: #fff;
+      background: #03b1fc;
+    `}
+
+    ${success && css`
+      color: #000;
+      animation: ${keyframes`
+        from { color: #03b1fc; }
+        to { color: #000; }
+      `} 2s;
+    `}
+
+    ${error && css`
+      color: #fff;
+      background: #f54542;
+      display: inline-block;
+      position: relative;
+      animation: ${keyframes`
+        0% { transform: translateX(0) scale(1); }
+        50% { transform: translateX(-2px) scale(1.1); }
+        100% { transform: translateX(0) scale(1); }
+      `} 0.2s ease-out;
+    `}
   `
 )
 
@@ -98,24 +98,16 @@ const TypingTextDisplay = ({
           {paragraph.words.map((word, wordIndex) => (
             <Word
               key={wordIndex}
-              // TODO: It's odd to have cursor be a boolean here, and part of single
-              // string status for Character component. Make consistent.
               cursor={word.isCurrent}
-              error={!word.isMatch}
+              error={word.isActive && !word.isMatch}
             >
               {word.chars.map((char, charIndex) => {
                 return (
                   <Character
                     key={charIndex}
-                    status={
-                      char.isCurrent
-                        ? 'cursor'
-                        : !char.isActive
-                          ? 'inactive'
-                          : char.isMatch
-                            ? 'success'
-                            : 'error'
-                    }
+                    cursor={char.isCurrent}
+                    error={char.isActive && !char.isMatch}
+                    success={char.isActive && char.isMatch}
                   >
                     {charValueMap[char.targetValue] || char.targetValue}
                   </Character>
