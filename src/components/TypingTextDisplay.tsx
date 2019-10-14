@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx, css, keyframes } from '@emotion/core'
-import { Fragment } from 'react'
+import { Fragment, useRef, useEffect } from 'react'
 import styled from '@emotion/styled'
 import { getTextComparisonMeta } from '../lib/getTextComparisonMeta'
 
@@ -27,16 +27,26 @@ const Word = styled.span<{
     position: relative;
     display: inline-block;
     margin: 0.5rem 0;
-    outline-color: ${cursor
-      ? error
-        ? '#f54542'
-        : '#03b1fc'
-      : 'transparent'
-    };
-    outline-width: 1px;
-    outline-style: solid;
-    outline-offset: -1px;
-    transition: outline-color 0.2s;
+
+    /* Add a ::before element out of document flow to add a border
+       around the word without causing characters to shift position. */
+    &::before {
+      content: "";
+      position: absolute;
+      top: -1px;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      z-index: -1;
+      /* TODO: transaition works with shorthand here? */
+      transition: border-color 0.2s;
+      border: 1px solid ${cursor
+        ? error
+          ? '#f54542'
+          : '#03b1fc'
+        : 'transparent'
+      };
+    }
   `
 )
 
@@ -89,7 +99,17 @@ const TypingTextDisplay = ({
   value: string
   targetValue: string
 }) => {
+  const charCursorRef = useRef(null as null | HTMLElement)
   const paragraphs = getTextComparisonMeta(targetValue, value)
+
+  useEffect(() => {
+    if (charCursorRef.current) {
+      charCursorRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      })
+    }
+  })
 
   return (
     <Layout>
@@ -105,6 +125,7 @@ const TypingTextDisplay = ({
                 return (
                   <Character
                     key={charIndex}
+                    ref={char.isCurrent ? charCursorRef : null}
                     cursor={char.isCurrent}
                     error={char.isActive && !char.isMatch}
                     success={char.isActive && char.isMatch}
