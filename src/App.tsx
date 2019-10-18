@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
-import { Fragment, useState } from 'react'
+import { StrictMode, useState } from 'react'
 import StylesGlobal from './components/StylesGlobal'
 import TypingStatsDisplay from './components/TypingStatsDisplay'
 import TypingTextInput from './components/TypingTextInput'
@@ -13,7 +13,7 @@ const App = () => {
   console.log(value)
 
   return (
-    <Fragment>
+    <StrictMode>
       <TypingTextInput
         value={value}
         onChange={event => setValue(event.currentTarget.value)}
@@ -28,7 +28,7 @@ const App = () => {
         value={value}
         targetValue={targetValue}
       />
-    </Fragment>
+    </StrictMode>
   );
 }
 
