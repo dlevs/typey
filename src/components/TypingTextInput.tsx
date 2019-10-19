@@ -12,11 +12,7 @@ const TypingTextInput = ({
 
   return (
     <textarea
-      css={[styles.visuallyHidden, {
-        // Prevent page from scrolling when field is focused
-        position: 'fixed',
-        top: 0
-      }]}
+      css={styles.visuallyHidden}
       autoFocus
       ref={textAreaRef}
       value={value}
@@ -29,7 +25,9 @@ const TypingTextInput = ({
       onBlur={() => {
         requestAnimationFrame(() => {
           if (textAreaRef.current) {
-            textAreaRef.current.focus()
+            textAreaRef.current.focus({
+              preventScroll: true
+            })
           }
         })
       }}

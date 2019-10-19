@@ -34,6 +34,8 @@ export const playBufferWithRandomVariation = async (
 }
 
 const preloadedSounds = {
+  // Thanks to freesound.org user "Horn" for typewriter sound.
+  // https://freesound.org/people/Horn/sounds/9744
   typeWriterClick: loadAudioBuffer('/audio/9744_28132-hq.mp3')
 }
 

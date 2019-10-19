@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
-import { StrictMode, useState } from 'react'
+import { StrictMode, useState, useRef } from 'react'
 import StylesGlobal from './components/StylesGlobal'
 import TypingStatsDisplay from './components/TypingStatsDisplay'
 import TypingTextInput from './components/TypingTextInput'
@@ -10,13 +10,16 @@ const App = () => {
   // const chars = useKeysPressed(window, playKeypressSound)
   const [value, setValue] = useState('')
   const targetValue = 'When you spring to an idea, and decide it is truth, without evidence, you blind yourself to other possibilities.\n\tKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.'
-  console.log(value)
 
   return (
     <StrictMode>
       <TypingTextInput
         value={value}
-        onChange={event => setValue(event.currentTarget.value)}
+        onChange={event => {
+          const { value } = event.currentTarget
+          const valueClamped = value.substring(0, targetValue.length)
+          setValue(valueClamped)
+        }}
       />
       <StylesGlobal />
       <TypingStatsDisplay

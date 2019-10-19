@@ -33,11 +33,11 @@ const Word = styled.span<{
     &::before {
       content: "";
       position: absolute;
-      top: -1px;
-      bottom: -1px;
+      top: 0;
+      bottom: 0;
       left: 0;
       right: 0;
-      z-index: -1;
+      z-index: 1;
       /* TODO: transaition works with shorthand here? */
       transition: border-color 0.2s;
       border: 1px solid ${cursor
@@ -103,12 +103,14 @@ const TypingTextDisplay = ({
   const paragraphs = getTextComparisonMeta(targetValue, value)
 
   useEffect(() => {
-    if (charCursorRef.current) {
-      charCursorRef.current.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      })
-    }
+    requestAnimationFrame(() => {
+      if (charCursorRef.current) {
+        charCursorRef.current.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        })
+      }
+    })
   })
 
   return (
