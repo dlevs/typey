@@ -1,10 +1,22 @@
 /** @jsx jsx */
 import { Global, css, jsx } from '@emotion/core'
 
+const textHighlight = css`
+  color: #fff;
+  background: #888;
+`
+
 const StylesGlobal = () =>
   <Global styles={css`
     *, *::before, *::after {
       box-sizing: border-box;
+    }
+
+    ::-moz-selection {
+      ${textHighlight}
+    }
+    ::selection {
+      ${textHighlight}
     }
 
     html,
@@ -18,6 +30,7 @@ const StylesGlobal = () =>
     body {
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      scroll-behavior: smooth;
     }
   `} />
 

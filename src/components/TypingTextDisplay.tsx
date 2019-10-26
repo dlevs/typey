@@ -1,25 +1,15 @@
 /** @jsx jsx */
 import { jsx, css, keyframes } from '@emotion/core'
-import { Fragment, useRef, useEffect } from 'react'
+import { Fragment, useRef, useEffect, memo } from 'react'
 import styled from '@emotion/styled'
+import { isEqual } from 'lodash-es'
 import { getTextComparisonMeta } from '../lib/getTextComparisonMeta'
 
-const Layout = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  font-size: 2rem;
-  color: #888;
-  max-width: 60rem;
-  padding: 2rem;
-  font-family: menlo, monospace;
-  margin: 0 auto;
-  overflow: auto;
+const Paragraph = styled.p`
+  /* cursor: text; */
 `
 
-const Word = styled.span<{
+const Word = memo(styled.span<{
   cursor: boolean
   error: boolean
 }>(({ cursor, error }) =>
@@ -38,6 +28,7 @@ const Word = styled.span<{
       left: 0;
       right: 0;
       z-index: 1;
+      pointer-events: none;
       /* TODO: transaition works with shorthand here? */
       transition: border-color 0.2s;
       border: 1px solid ${cursor
@@ -48,9 +39,9 @@ const Word = styled.span<{
       };
     }
   `
-)
+))
 
-const Character = styled.span<{
+const Character = memo(styled.span<{
   cursor: boolean
   error: boolean
   success: boolean
@@ -84,7 +75,7 @@ const Character = styled.span<{
       `} 0.2s ease-out;
     `}
   `
-)
+))
 
 const charValueMap: { [char: string]: JSX.Element | undefined } = {
   ' ': <Fragment>&nbsp;</Fragment>,
@@ -92,31 +83,51 @@ const charValueMap: { [char: string]: JSX.Element | undefined } = {
   '\t': <Fragment>⇨&nbsp;</Fragment>
 }
 
-const TypingTextDisplay = ({
+interface Position {
+  top: number;
+  left: number;
+}
+
+const TypingTextDisplay = memo(({
   value,
-  targetValue
+  targetValue,
+  onCursorPositionChanged
 }: {
   value: string
   targetValue: string
+  onCursorPositionChanged: (position: Position) => void
 }) => {
-  const charCursorRef = useRef(null as null | HTMLElement)
   const paragraphs = getTextComparisonMeta(targetValue, value)
+  const cursorRef = useRef(null as null | HTMLTextAreaElement)
+  const cursorPosition = useRef({ top: 0, left: 0 })
 
   useEffect(() => {
+    const cursorEl = cursorRef.current
+
+    if (!cursorEl) return
+
+    const { top, left } = cursorEl.getBoundingClientRect()
+    const newPosition = {
+      top: top + window.scrollY,
+      left: left + window.scrollX
+    }
+
+    if (!isEqual(newPosition, cursorPosition.current)) {
+      onCursorPositionChanged(newPosition)
+      cursorPosition.current = newPosition
+    }
+
     requestAnimationFrame(() => {
-      if (charCursorRef.current) {
-        charCursorRef.current.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        })
-      }
+      cursorEl.scrollIntoView({
+        block: 'center'
+      })
     })
   })
 
   return (
-    <Layout>
+    <Fragment>
       {paragraphs.map((paragraph, paragraphIndex) => (
-        <p key={paragraphIndex}>
+        <Paragraph key={paragraphIndex}>
           {paragraph.words.map((word, wordIndex) => (
             <Word
               key={wordIndex}
@@ -127,7 +138,7 @@ const TypingTextDisplay = ({
                 return (
                   <Character
                     key={charIndex}
-                    ref={char.isCurrent ? charCursorRef : null}
+                    ref={char.isCurrent ? cursorRef : null}
                     cursor={char.isCurrent}
                     error={char.isActive && !char.isMatch}
                     success={char.isActive && char.isMatch}
@@ -138,10 +149,10 @@ const TypingTextDisplay = ({
               })}
             </Word>
           ))}
-        </p>
+        </Paragraph>
       ))}
-    </Layout>
+    </Fragment>
   )
-}
+})
 
 export default TypingTextDisplay
