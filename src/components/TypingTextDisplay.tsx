@@ -2,7 +2,6 @@
 import { jsx, css, keyframes } from '@emotion/core'
 import { Fragment, useRef, useEffect, memo } from 'react'
 import styled from '@emotion/styled'
-import { isEqual } from 'lodash-es'
 import { getTextComparisonMeta } from '../lib/getTextComparisonMeta'
 
 const Paragraph = styled.p`
@@ -83,44 +82,23 @@ const charValueMap: { [char: string]: JSX.Element | undefined } = {
   '\t': <Fragment>⇨&nbsp;</Fragment>
 }
 
-interface Position {
-  top: number;
-  left: number;
-}
-
 const TypingTextDisplay = memo(({
   value,
-  targetValue,
-  onCursorPositionChanged
+  targetValue
 }: {
   value: string
   targetValue: string
-  onCursorPositionChanged: (position: Position) => void
 }) => {
   const paragraphs = getTextComparisonMeta(targetValue, value)
   const cursorRef = useRef(null as null | HTMLTextAreaElement)
-  const cursorPosition = useRef({ top: 0, left: 0 })
 
   useEffect(() => {
-    const cursorEl = cursorRef.current
-
-    if (!cursorEl) return
-
-    const { top, left } = cursorEl.getBoundingClientRect()
-    const newPosition = {
-      top: top + window.scrollY,
-      left: left + window.scrollX
-    }
-
-    if (!isEqual(newPosition, cursorPosition.current)) {
-      onCursorPositionChanged(newPosition)
-      cursorPosition.current = newPosition
-    }
-
     requestAnimationFrame(() => {
-      cursorEl.scrollIntoView({
-        block: 'center'
-      })
+      if (cursorRef.current) {
+        cursorRef.current.scrollIntoView({
+          block: 'center'
+        })
+      }
     })
   })
 

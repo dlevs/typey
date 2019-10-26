@@ -29,7 +29,6 @@ const App = () => {
   // const chars = useKeysPressed(window, playKeypressSound)
   const [value, setValue] = useState('')
   const targetValue = 'When you spring to an idea, and decide it is truth, without evidence, you blind yourself to other possibilities.\n\tKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.'
-  const [cursorPosition, setCursorPosition] = useState({ top: 0, left: 0 })
   const inputRef = useRef(null as null | HTMLTextAreaElement)
 
   return (
@@ -48,9 +47,6 @@ const App = () => {
         <TypingTextInput
           value={value}
           ref={inputRef}
-          // Set textarea position to browser doesn't try to focus away from cursor
-          // on type.
-          css={cursorPosition}
           onValueChange={value => {
             setValue(
               value.substring(0, targetValue.length)
@@ -60,7 +56,6 @@ const App = () => {
         <TypingTextDisplay
           value={value}
           targetValue={targetValue}
-          onCursorPositionChanged={setCursorPosition}
         />
       </TypingTextWrapper>
     </StrictMode>

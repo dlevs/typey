@@ -1,28 +1,8 @@
 /** @jsx jsx */
-import { jsx } from '@emotion/core'
-import styled from '@emotion/styled'
+import { jsx, css } from '@emotion/core'
 import { HTMLProps, forwardRef } from 'react'
 import { playKeypressSound } from '../lib/audioUtils'
-
-// Textarea styling and behaviour uses same approach as monaco editor.
-// https://microsoft.github.io/monaco-editor/
-const OnePixelTextarea = styled.textarea`
-  min-width: 0;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  outline: none;
-  resize: none;
-  border: none;
-  overflow: hidden;
-  color: transparent;
-  background-color: transparent;
-  font-size: 1px;
-  line-height: 1rem;
-  width: 1px;
-  height: 1px;
-`
+import { visuallyHidden } from '../lib/utilityStyles'
 
 type Props = HTMLProps<HTMLTextAreaElement> & {
   onValueChange: (value: string) => void
@@ -34,7 +14,7 @@ const TypingTextInput = forwardRef<HTMLTextAreaElement, Props>(({
   ...rest
 }, ref) => {
   return (
-    <OnePixelTextarea
+    <textarea
       {...rest}
       ref={ref}
       autoFocus
@@ -44,6 +24,10 @@ const TypingTextInput = forwardRef<HTMLTextAreaElement, Props>(({
       autoCapitalize='off'
       autoComplete='off'
       spellCheck={false}
+      css={[visuallyHidden, css`
+        position: fixed;
+        top: 0;
+      `]}
       onKeyDown={event => {
         const isTab = event.key === 'Tab'
 
