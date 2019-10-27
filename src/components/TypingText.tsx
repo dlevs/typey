@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import TypingTextInput from './TypingTextInput'
 import TypingTextDisplay from './TypingTextDisplay'
 import TypingTextWrapper from './TypingTextWrapper'
@@ -18,13 +18,27 @@ const TypingText = ({
   const inputRef = useRef(null as null | HTMLTextAreaElement)
   const { focused, ...focusProps } = useFocusState()
 
+  // If textarea is pre-populated, selection may be at start of input, not end.
+  // Enforce that user selection is always in correct place.
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.selectionStart = value.length
+      inputRef.current.selectionEnd = value.length
+    }
+  })
+
   return (
     <TypingTextWrapper
       {...focusProps}
       focused={focused}
       onClick={() => {
-        if (inputRef.current) {
-          inputRef.current.focus()
+        if (
+          inputRef.current &&
+          inputRef.current !== document.activeElement
+        ) {
+          inputRef.current.focus({
+            preventScroll: true
+          })
         }
       }}
     >
