@@ -26,7 +26,8 @@ const TypingTextInput = forwardRef<HTMLTextAreaElement, Props>(({
       spellCheck={false}
       css={[visuallyHidden, css`
         position: fixed;
-        top: 0;
+        /* Put input in middle of screen to prevent scroll jumping when focusing. */
+        top: 50%;
       `]}
       onKeyDown={event => {
         const isTab = event.key === 'Tab'
