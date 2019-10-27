@@ -8,7 +8,7 @@ import TypingStatsDisplay from './components/TypingStatsDisplay'
 const App = () => {
   // const chars = useKeysPressed(window, playKeypressSound)
   const [value, setValue] = useState('')
-  const targetValue = '\nWhen you spring to an idea, and decide it is truth, without evidence, you blind yourself to other possibilities.\n\tKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.'
+  const targetValue = 'When you spring to an idea, and decide it is truth, without evidence, you blind yourself to other possibilities.\n\tKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.'
 
   return (
     <StrictMode>

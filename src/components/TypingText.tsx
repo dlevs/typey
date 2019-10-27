@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import TypingTextInput from './TypingTextInput'
 import TypingTextDisplay from './TypingTextDisplay'
 import TypingTextWrapper from './TypingTextWrapper'
+import useFocusState from '../hooks/useFocusState'
 
 const TypingText = ({
   targetValue,
@@ -15,13 +16,18 @@ const TypingText = ({
   onValueChange: (value: string) => void
 }) => {
   const inputRef = useRef(null as null | HTMLTextAreaElement)
+  const { focused, ...focusProps } = useFocusState()
 
   return (
-    <TypingTextWrapper onClick={() => {
-      if (inputRef.current) {
-        inputRef.current.focus()
-      }
-    }}>
+    <TypingTextWrapper
+      {...focusProps}
+      focused={focused}
+      onClick={() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+        }
+      }}
+    >
       <TypingTextInput
         value={value}
         ref={inputRef}
@@ -34,6 +40,7 @@ const TypingText = ({
       <TypingTextDisplay
         value={value}
         targetValue={targetValue}
+        focused={focused}
       />
     </TypingTextWrapper>
   )

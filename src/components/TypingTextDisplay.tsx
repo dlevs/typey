@@ -11,7 +11,8 @@ const Paragraph = styled.p`
 const Word = memo(styled.span<{
   cursor: boolean
   error: boolean
-}>(({ cursor, error }) =>
+  focused: boolean
+}>(({ cursor, error, focused }) =>
   css`
     position: relative;
     display: inline-block;
@@ -28,7 +29,7 @@ const Word = memo(styled.span<{
       right: 0;
       z-index: 1;
       pointer-events: none;
-      border: 1px solid ${cursor
+      border: 1px solid ${cursor && focused
         ? error
           ? '#f54542'
           : '#03b1fc'
@@ -42,8 +43,9 @@ const Character = memo(styled.span<{
   cursor: boolean
   error: boolean
   success: boolean
+  focused: boolean
 }>(
-  ({ cursor, error, success }) => css`
+  ({ cursor, error, success, focused }) => css`
     display: inline-block;
     margin: 0 1px;
 
@@ -54,7 +56,7 @@ const Character = memo(styled.span<{
     height: 2.5rem;
     line-height: 2.5rem;
 
-    ${cursor && css`
+    ${focused && cursor && css`
       color: #fff;
       background: #03b1fc;
     `}
@@ -89,10 +91,12 @@ const charValueMap: { [char: string]: JSX.Element | undefined } = {
 
 const TypingTextDisplay = memo(({
   value,
-  targetValue
+  targetValue,
+  focused
 }: {
   value: string
   targetValue: string
+  focused: boolean
 }) => {
   const paragraphs = getTextComparisonMeta(targetValue, value)
   const cursorRef = useRef(null as null | HTMLTextAreaElement)
@@ -116,6 +120,7 @@ const TypingTextDisplay = memo(({
               key={wordIndex}
               cursor={word.isCurrent}
               error={word.isActive && !word.isMatch}
+              focused={focused}
             >
               {word.chars.map((char, charIndex) => {
                 return (
@@ -125,6 +130,7 @@ const TypingTextDisplay = memo(({
                     cursor={char.isCurrent}
                     error={char.isActive && !char.isMatch}
                     success={char.isActive && char.isMatch}
+                    focused={focused}
                   >
                     {charValueMap[char.targetValue] || char.targetValue}
                   </Character>

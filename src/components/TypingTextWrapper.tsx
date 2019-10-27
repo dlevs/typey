@@ -1,7 +1,10 @@
+import { css } from '@emotion/core';
 import styled from '@emotion/styled';
 
-const TypingTextWrapper = styled.div`
-  opacity: 0.7;
+const TypingTextWrapper = styled.div<{
+  focused: boolean
+}>(({ focused }) => css`
+  opacity: ${focused ? 1 : 0.7};
   transition: opacity 0.3s;
   font-size: 2rem;
   line-height: normal;
@@ -12,10 +15,9 @@ const TypingTextWrapper = styled.div`
   margin: 0 auto;
   border: 1px solid #999;
 
-  :hover,
-  :focus-within {
+  :hover {
     opacity: 1;
   }
-`;
+`);
 
 export default TypingTextWrapper
