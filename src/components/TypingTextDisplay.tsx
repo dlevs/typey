@@ -28,8 +28,6 @@ const Word = memo(styled.span<{
       right: 0;
       z-index: 1;
       pointer-events: none;
-      /* TODO: transaition works with shorthand here? */
-      transition: border-color 0.2s;
       border: 1px solid ${cursor
         ? error
           ? '#f54542'
@@ -46,8 +44,15 @@ const Character = memo(styled.span<{
   success: boolean
 }>(
   ({ cursor, error, success }) => css`
+    display: inline-block;
     margin: 0 1px;
-    transition: background 0.2s;
+
+    /* Explicitly set line-height and height to be the same.
+       This prevents visual glitches with unicode characters like ⏎ and ⇨,
+       which may fall back to a different font with larger line-height.
+    */
+    height: 2.5rem;
+    line-height: 2.5rem;
 
     ${cursor && css`
       color: #fff;
