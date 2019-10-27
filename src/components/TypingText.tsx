@@ -21,10 +21,14 @@ const TypingText = ({
   // If textarea is pre-populated, selection may be at start of input, not end.
   // Enforce that user selection is always in correct place.
   useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.selectionStart = value.length
-      inputRef.current.selectionEnd = value.length
-    }
+    const el = inputRef.current
+
+    if (!el) return
+
+    const { length } = el.value
+
+    el.selectionStart = length
+    el.selectionEnd = length
   })
 
   return (
