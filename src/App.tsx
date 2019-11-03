@@ -1,6 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '@emotion/core'
-import { StrictMode, useState, useTransition, Fragment, Suspense } from 'react'
+import { StrictMode, useState, useTransition, Fragment, Suspense, useEffect } from 'react'
 import StylesGlobal from './components/StylesGlobal'
 import ErrorBoundary from './components/ErrorBoundary'
 import TypingText from './components/TypingText'
@@ -8,29 +8,31 @@ import TypingStatsDisplay from './components/TypingStatsDisplay'
 import { wrapPromise, Resource } from './lib/suspenseUtils'
 import { getPageSummary } from './api/wikipedia'
 
-const initialResource = wrapPromise(
-  Promise.resolve('When you spring to an idea, and decide it is truth, without evidence, you blind yourself to other possibilities.\n\tKeep these nutty chicken satay strips in the fridge for a healthy choice when you\'re peckish. The chicken is served with cucumber and sweet chilli sauce.')
-)
+const createExtractResource = (query: string) => {
+  const promise = getPageSummary(query).then(({ extract }) => extract)
+  return wrapPromise(promise)
+}
+
+const initialResource = createExtractResource('Harry Potter')
 
 // TODO: Tidy
 const ExperimentalApp = () => {
   const [targetValueResource, setTargetValueResource] = useState(initialResource)
-  const [startTransition] = useTransition({ timeoutMs: 2000 });
+  const [startTransition] = useTransition({ timeoutMs: 500 })
   const [searchTerm, setSearchTerm] = useState('')
-  const [searchedTerm, setSearchedTerm] = useState(null as null || '')
+  const [value, setValue] = useState('')
+
+  useEffect(() => {
+    setValue('')
+  }, [targetValueResource])
 
   return (
-    <Fragment>
+    <StrictMode>
       <form onSubmit={event => {
         event.preventDefault()
 
         startTransition(() => {
-          setTargetValueResource(
-            wrapPromise(
-              getPageSummary(searchTerm).then(({ extract }) => extract)
-            )
-          )
-          setSearchedTerm(searchTerm)
+          setTargetValueResource(createExtractResource(searchTerm))
         })
       }}>
         <input
@@ -41,32 +43,41 @@ const ExperimentalApp = () => {
         />
       </form>
       <ErrorBoundary
-        // TODO: This won't reset the boundary if search term is same twice in a row, and 2nd is successful
-        errorKey={searchedTerm}
+        errorKey={targetValueResource.id}
         fallbackMap={{
           404: 'No results found',
           default: 'Something went wrong'
         }}
       >
         <Suspense fallback={'loading...'}>
-          <App targetValueResource={targetValueResource} />
+          <App
+            value={value}
+            onValueChange={setValue}
+            targetValueResource={targetValueResource}
+          />
         </Suspense>
       </ErrorBoundary>
-    </Fragment>
+    </StrictMode>
   )
 }
 
 const App = ({
+  value,
+  onValueChange,
   targetValueResource
 }: {
+  value: string
+  onValueChange: (value: string) => void
   targetValueResource: Resource<string>
 }) => {
+  console.log('before', targetValueResource)
+
   // const chars = useKeysPressed(window, playKeypressSound)
   const targetValue = targetValueResource.read()
-  const [value, setValue] = useState('')
+  console.log('after', targetValueResource)
 
   return (
-    <StrictMode>
+    <Fragment>
       <StylesGlobal />
       <TypingStatsDisplay
         // TODO: nope
@@ -75,10 +86,10 @@ const App = ({
       />
       <TypingText
         value={value}
-        onValueChange={setValue}
+        onValueChange={onValueChange}
         targetValue={targetValue}
       />
-    </StrictMode>
+    </Fragment>
   );
 }
 

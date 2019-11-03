@@ -1,4 +1,7 @@
+import { uniqueId } from 'lodash-es'
+
 export interface Resource<T> {
+  id: string,
   read(): T
 }
 
@@ -22,8 +25,11 @@ type PromiseState <T> = {
 export const wrapPromise = <T> (
   promise: Promise<T>
 ): Resource<T> => {
-  let state: PromiseState<T> = { status: 'pending' };
-  let suspender = promise.then(
+  let state: PromiseState<T> = {
+    status: 'pending'
+  };
+  const id = uniqueId('wrapped_promise_')
+  const suspender = promise.then(
     r => {
       state = {
         status: 'success',
@@ -39,6 +45,7 @@ export const wrapPromise = <T> (
   );
 
   return {
+    id,
     read() {
       switch (state.status) {
         case 'pending':

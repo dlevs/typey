@@ -27,7 +27,10 @@ export default class ErrorBoundary extends Component<Props> {
 
     if (error && errorKey === stateErrorKey) {
       if (fallbackMap) {
-        if ('statusCode' in error && fallbackMap[error.statusCode]) {
+        if (
+          error instanceof RequestError &&
+          fallbackMap[error.statusCode]
+        ) {
           return fallbackMap[error.statusCode]
         }
         return fallbackMap.default
