@@ -6,7 +6,7 @@
     "@emotion/core": "10.0.22",
     "@emotion/styled": "10.0.22",
     "hooks.macro": "1.0.1",
-    "lodash-es": "4.17.15",
+    "lodash-es": "4.17.21",
     "react": "16.11.0",
     "react-dom": "16.11.0",
     "reselect": "4.0.0"
